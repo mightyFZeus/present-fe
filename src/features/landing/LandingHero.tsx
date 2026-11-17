@@ -10,7 +10,7 @@ export function LandingHero() {
     </div>
     <div className="landing-hero-bottom">
       <p className="landing-hero-description">
-        Present matches your voice to the deck you already have.
+        Prezntly matches your voice to the deck you already have.
         Stay with your audience.
       </p>
       <div className="landing-hero-action-group">

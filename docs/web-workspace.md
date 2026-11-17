@@ -1,4 +1,4 @@
-# Present workspace
+# Prezntly workspace
 
 The protected `/workspace` is a standalone presentation library. Uploaded files
 appear as cards; opening one navigates to `/workspace/[presentationId]`, where

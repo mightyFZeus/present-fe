@@ -6,17 +6,17 @@ export function AutomaticFollowingSection() {
     <div className="landing-feature-copy">
       <h2 id="following-title">Follow the thought.<br /><em>Not a script.</em></h2>
       <p className="landing-lead">
-        Your deck gives Present the context. Your voice gives it the direction.
+        Your deck gives Prezntly the context. Your voice gives it the direction.
       </p>
       <p>
-        Present prepares the meaning behind your slides, then matches what you’re
+        Prezntly prepares the meaning behind your slides, then matches what you’re
         discussing to that context. No separate script or recorded rehearsal.
       </p>
     </div>
     <dl className="landing-following-notes">
       <div>
         <dt>Stay with the topic.</dt>
-        <dd>Explain an idea naturally. Present can bring the relevant slide into view.</dd>
+        <dd>Explain an idea naturally. Prezntly can bring the relevant slide into view.</dd>
       </div>
       <div>
         <dt>Revisit an earlier point.</dt>

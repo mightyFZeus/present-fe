@@ -1,6 +1,6 @@
-# Present web
+# Prezntly web
 
-Present uses vinext and Vite with the native Cloudflare Workers integration.
+Prezntly uses vinext and Vite with the native Cloudflare Workers integration.
 The application keeps its App Router structure, TypeScript and `next/*` APIs;
 vinext supplies their runtime implementations. Redux Toolkit/RTK Query, Axios,
 React Redux, Tailwind CSS and Lucide React retain their existing responsibilities.
@@ -136,4 +136,3 @@ real vinext routing context, but cannot replace local Worker/browser validation.
 Verify public/auth/workspace/deep links, fonts, images and `/audio/*.mjs` under
 both development and local production preview. Real Google/provider calls require
 separate intentional configuration and are not part of the local migration smoke.
-# present-fe

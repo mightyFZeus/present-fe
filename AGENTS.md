@@ -1,4 +1,4 @@
-# Present frontend conventions
+# Prezntly frontend conventions
 
 - Use TypeScript and the existing App Router/`next/*` application APIs through
   vinext, Vite and the native Cloudflare integration. Keep application imports

@@ -4,7 +4,7 @@ import { canonicalPresentationId } from "@/features/workspace/libraryHelpers";
 import { Workspace } from "@/features/workspace/Workspace";
 
 export const metadata: Metadata = {
-  title: "Presentation | Present",
+  title: "Presentation | Prezntly",
   description: "Review your prepared slides and explicitly start live following.",
   robots: { index: false, follow: false },
 };

@@ -8,5 +8,5 @@
 
 The local JPEG preserves the downloaded image bytes and colors. CSS crops it for
 wide and mobile layouts. It illustrates a presentation setting; the photograph
-is not a product screenshot, customer story or claim that the people use Present.
+is not a product screenshot, customer story or claim that the people use Prezntly.
 The original source is also credited in the landing footer.

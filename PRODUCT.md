@@ -37,7 +37,7 @@ the same workflow and leads directly into it.
 ## Anti-references
 
 The user supplied [Pewbeam](https://pewbeam.com/) as visual inspiration for the
-public landing page. Present keeps its own Manrope type, mint/teal accent, imagery,
+public landing page. Prezntly keeps its own Manrope type, mint/teal accent, imagery,
 copy and Google-only login flow; the reference is not a template to copy. The
 implementation avoids decorative metrics, fake decks, fabricated transcripts and
 visual effects that compete with the actual presentation. Public examples must

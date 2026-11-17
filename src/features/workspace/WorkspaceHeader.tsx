@@ -11,9 +11,9 @@ export function WorkspaceHeader({ presenter = false }: { presenter?: boolean }) 
   const store = useAppStore();
   const user = useAppSelector((state) => state.auth.user);
   return <header className="workspace-header">
-    <Link href="/" className="brand" aria-label="Present home">
+    <Link href="/" className="brand" aria-label="Prezntly home">
       <span className="brand-mark"><Presentation size={20} strokeWidth={1.5} aria-hidden="true" /></span>
-      <span>Present</span>
+      <span>Prezntly</span>
     </Link>
     {presenter ? <Link href="/workspace" className="workspace-back" aria-label="Back to workspace" prefetch={false}>
       <ArrowLeft size={16} aria-hidden="true" />Back to workspace

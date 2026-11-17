@@ -6,7 +6,7 @@ import { StoreProvider } from "@/components/providers/StoreProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Present",
+  title: "Prezntly",
   description: "Present with your voice. Your slides follow along.",
 };
 

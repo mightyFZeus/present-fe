@@ -1,4 +1,4 @@
-# Present design
+# Prezntly design
 
 ## Physical scene and theme
 
@@ -223,7 +223,7 @@ the hero, tightened desktop rhythm and completed responsive/keyboard fixes.
 ## Login and protected workspace
 
 The `/login` page uses a pale blue-neutral canvas and one centered white rounded
-card. It carries Present’s own icon/brand, a visible Welcome to Present heading,
+card. It carries Prezntly’s own icon/brand, a visible Welcome to Prezntly heading,
 short explanatory copy and one genuine Google SDK button. Google remains the only
 sign-in method: no email/password fields, OR divider or duplicate sign-in widget. Loading, configuration,
 backend error and retry states appear only when needed. Use independently scoped

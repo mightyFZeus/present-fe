@@ -3,8 +3,8 @@ import { ArrowUpRight, Presentation } from "lucide-react";
 
 export function LandingHeader() {
   return <header className="landing-shell landing-header">
-    <Link href="/" className="landing-brand" aria-label="Present home">
-      <Presentation size={27} strokeWidth={1.6} aria-hidden="true" /><span>Present</span>
+    <Link href="/" className="landing-brand" aria-label="Prezntly home">
+      <Presentation size={27} strokeWidth={1.6} aria-hidden="true" /><span>Prezntly</span>
     </Link>
     <nav className="landing-navigation" aria-label="Main navigation">
       <a href="#features" className="landing-features-link">Features</a>

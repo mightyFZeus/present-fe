@@ -1,6 +1,6 @@
 # Cloudflare deployment
 
-Present uses vinext with Vite and the Cloudflare Vite plugin. Its existing App
+Prezntly uses vinext with Vite and the Cloudflare Vite plugin. Its existing App
 Router files and `next/*` imports remain application APIs. `cloudflare.config.ts`
 is the Worker configuration; this setup does not use a Wrangler project config.
 

@@ -9,7 +9,7 @@ export function LandingBenefits() {
     <div className="landing-benefit-copy">
       <h2 id="benefits-title">One less thing<br /><em>to coordinate.</em></h2>
       <p className="landing-lead">
-        You have a room to speak to. Present helps with the slide changes.
+        You have a room to speak to. Prezntly helps with the slide changes.
       </p>
       <p>
         Less reaching for a clicker. Less asking somebody else to advance the deck.
