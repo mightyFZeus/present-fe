@@ -1,0 +1,53 @@
+/* Presentation view keeps the existing viewer and asset owner mounted. */
+.present-workspace.is-presenting .workspace-header,
+.present-workspace.is-presenting .deck-sidebar,
+.present-workspace.is-presenting .skip-link,
+.presentation-active .stage-heading,
+.presentation-active .stage-footnote,
+.presentation-active > .following-panel,
+.presentation-active > .speech-panel { display: none; }
+.present-workspace.is-presenting .workspace-body { display: block; min-height: 0; }
+.presentation-host.presentation-active {
+  position: fixed; inset: 0; z-index: 50;
+  width: 100%; height: 100dvh; min-height: 0; padding: 0; gap: 0;
+  overflow: hidden; background: var(--stage);
+}
+.presentation-active .stage-section { width: 100%; height: 100%; min-height: 0; gap: 0; }
+.presentation-active .slide-stage {
+  width: 100%; height: 100%; min-height: 0; max-height: none;
+  border: 0; border-radius: 0; aspect-ratio: auto; flex: 1;
+}
+.presentation-active .stage-image { object-fit: contain; }
+.presentation-active .slide-stage:focus-visible { outline-offset: -3px; }
+.presentation-toolbar {
+  position: absolute; z-index: 2; left: 50%; bottom: max(20px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); max-width: calc(100% - 24px);
+  color: var(--stage-text); background: oklch(0.29 0.012 200);
+  border: 1px solid oklch(0.42 0.012 200); border-radius: 10px; padding: 5px;
+  transition: opacity 160ms ease-out, visibility 160ms ease-out;
+}
+.presentation-toolbar.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.presentation-control-row, .presentation-navigation { display: flex; align-items: center; gap: 3px; }
+.presentation-control-row { flex-wrap: wrap; justify-content: center; }
+.presentation-control-row button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  flex-shrink: 0; min-width: 40px; min-height: 40px; padding: 8px;
+  color: inherit; background: transparent; border: 1px solid transparent; border-radius: 6px;
+  font-size: 12px; line-height: 1.2;
+}
+.presentation-control-row button:hover:not(:disabled) { background: oklch(0.36 0.012 200); }
+.presentation-control-row button:focus-visible { outline-color: oklch(0.8 0.07 185); outline-offset: 1px; }
+.presentation-control-row button:disabled { opacity: 0.4; }
+.presentation-workspace-button { margin-right: 6px; }
+.presentation-count { min-width: 41px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; }
+.presentation-status { display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 11px; white-space: nowrap; }
+.presentation-status .status-dot { background: oklch(0.62 0.01 190); }
+.presentation-status .status-dot.active { background: oklch(0.8 0.07 185); }
+.presentation-error { max-width: 65ch; margin: 4px 8px 7px; font-size: 12px; line-height: 1.5; color: oklch(0.9 0.06 35); }
+@media (max-width: 600px) {
+  .presentation-toolbar { bottom: max(10px, env(safe-area-inset-bottom)); width: max-content; }
+  .presentation-status { padding-inline: 6px; }
+  .presentation-workspace-button { margin-right: 0; }
+  .presentation-control-row button { min-width: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .presentation-toolbar { transition: none; } }

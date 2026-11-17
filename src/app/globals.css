@@ -1,0 +1,29 @@
+@import "tailwindcss";
+:root {
+  --canvas: oklch(0.975 0.006 190);
+  --surface: oklch(0.995 0.003 190);
+  --surface-muted: oklch(0.95 0.008 190);
+  --ink: oklch(0.26 0.018 200);
+  --muted: oklch(0.49 0.018 200);
+  --line: oklch(0.86 0.01 190);
+  --accent: oklch(0.43 0.085 185);
+  --accent-hover: oklch(0.37 0.075 185);
+  --accent-tint: oklch(0.93 0.028 185);
+  --stage: oklch(0.235 0.012 200);
+  --stage-text: oklch(0.86 0.01 190);
+  --danger: oklch(0.46 0.15 28);
+  --danger-tint: oklch(0.965 0.015 28);
+}
+@theme inline {
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, monospace;
+}
+body { margin: 0; color: var(--ink); background: var(--canvas); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; font-size: 14px; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+button, a, input, [tabindex] { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+::selection { background: var(--accent-tint); color: var(--ink); }

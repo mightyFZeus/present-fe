@@ -1,0 +1,24 @@
+/* Auth entry is independent of both marketing and workspace styles. */
+.auth-page { min-height: 100dvh; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 32px 22px; background: oklch(0.968 0.012 225); color: var(--ink); }
+.auth-page .auth-login { width: min(100%, 420px); box-sizing: border-box; padding: 38px 30px 36px; text-align: center; background: var(--surface); border: 1px solid oklch(0.89 0.012 225); border-radius: 18px; box-shadow: 0 14px 48px -24px oklch(0.3 0.025 225 / .22); }
+.auth-page .auth-brand { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; color: var(--ink); text-decoration: none; font-size: 22px; font-weight: 600; letter-spacing: -0.04em; margin-bottom: 25px; }
+.auth-page .auth-brand-mark { display: grid; place-items: center; width: 36px; height: 36px; color: var(--accent); background: var(--accent-tint); border-radius: 9px; }
+.auth-page .auth-login h1 { font-size: 27px; line-height: 1.2; font-weight: 600; letter-spacing: -0.04em; margin: 0 0 12px; }
+.auth-page .auth-intro { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 auto 28px; max-width: 29ch; }
+.auth-page .auth-google-sign-in { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.auth-page .auth-google-button { min-height: 44px; display: flex; justify-content: center; align-items: center; }
+.auth-page .auth-google-button.busy { pointer-events: none; opacity: .55; }
+.auth-page .auth-pending, .auth-page .auth-supporting { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.auth-page .auth-error { margin: 0; font-size: 14px; line-height: 1.6; color: var(--danger); overflow-wrap: anywhere; }
+.auth-page .auth-error p { margin: 0; }
+.auth-page .auth-retry { min-height: 44px; padding: 8px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 5px; font-size: 14px; cursor: pointer; }
+.auth-page .auth-retry:hover { background: var(--surface-muted); }
+.auth-page .auth-spinner { animation: auth-flow-spin 1s linear infinite; }
+@keyframes auth-flow-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .auth-page .auth-spinner { animation: none; } }
+
+@media (max-width: 380px) {
+  .auth-page { padding: 24px 18px; }
+  .auth-page .auth-login { padding: 30px 20px; }
+  .auth-page .auth-login h1 { font-size: 25px; }
+}

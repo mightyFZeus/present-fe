@@ -1,0 +1,52 @@
+{
+  "name": "present-fe",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev --port 3000",
+    "build": "vite build",
+    "start": "vite preview",
+    "lint": "eslint",
+    "typecheck": "vinext typegen && cf workers types && tsc --noEmit",
+    "test": "node --import ./scripts/register-tests.mjs --test tests/*.test.mjs",
+    "dev:vinext": "vite dev --port 3000",
+    "build:vinext": "vite build",
+    "start:vinext": "vite preview",
+    "deploy:vinext": "vinext-cloudflare deploy",
+    "check:compat": "vinext check",
+    "check:deploy": "vinext-cloudflare deploy --dry-run",
+    "deploy": "vinext-cloudflare deploy"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.14.0",
+    "@vinext/cloudflare": "^1.4.0",
+    "axios": "^1.21.0",
+    "lucide-react": "^1.67.0",
+    "next": "16.4.4",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-redux": "^9.3.1",
+    "react-server-dom-webpack": "19.3.1",
+    "vinext": "^1.4.6"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^2.0.0-beta.v.17",
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.3.0",
+    "@vitejs/plugin-rsc": "^0.5.39",
+    "cf": "^1.0.0-rc.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.4",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vite": "8.3.3"
+  },
+  "type": "module",
+  "engines": {
+    "node": "^22.23.0 || ^24.22.0 || ^26.12.0"
+  },
+  "packageManager": "npm@11.20.0"
+}
