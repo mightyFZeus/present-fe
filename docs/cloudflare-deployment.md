@@ -29,9 +29,31 @@ npm start
 
 `npm start` runs `vite preview` on `http://localhost:3000`, a local production
 Worker preview of the built
-output. It does not publish a Worker. `npm run check:deploy` validates the deploy
-setup without building, authenticating or deploying; a successful dry run is not
-proof that the production build or runtime works.
+output. It does not publish a Worker. `npm run check:deploy` builds production
+output, validates it with the installed `cf` deployment reader, then dry-runs
+the deployment setup. It does not authenticate or publish. Runtime preview
+remains a separate check. To validate an existing build without rebuilding, run
+`npm run check:build-output`.
+
+## Build Output compatibility
+
+Keep `@cloudflare/vite-plugin@2.0.0-rc.0` and `cf@1.0.0-rc.0` pinned together.
+The plugin writes Build Output v1 and the CLI reads v1. The older plugin beta
+wrote v0, which the rc CLI rejects even when the application build succeeds.
+The offline check resolves `@cloudflare/build-output-utils` from `cf`, so it
+uses the actual consumer even when npm installs that dependency nested. It
+checks the full schema and rejects legacy or mixed-version output.
+
+The rc plugin automatically clears `.cloudflare/output` on an actual build,
+including restored v0 build cache, before generating v1. No project cleanup
+wrapper is needed. `.cloudflare` types/state outside that output directory are
+preserved. Normal build/deploy aliases use this path; `--skip-build` preserves
+prebuilt output and requires it to be valid already. Run `npm run build` if an
+old cache is rejected. The underlying deploy `--dry-run` returns before output
+validation; use `npm run check:deploy` for the complete local check.
+
+Release references: [Vite plugin rc.0](https://github.com/cloudflare/workers-sdk/releases/tag/%40cloudflare%2Fvite-plugin%402.0.0-rc.0)
+and [cf rc.0](https://github.com/cloudflare/cf/releases/tag/cf%401.0.0-rc.0).
 
 ## Selected resource choices
 
@@ -101,7 +123,10 @@ It builds and publishes through `vinext-cloudflare deploy` using the typed
 Cloudflare configuration. Unlike `npm start`, this is a real remote deployment.
 
 For Cloudflare Workers Builds, set the build command empty and deploy command to
-`npm run deploy`, because that command includes the build. Override the default
+`npm run deploy`, because that command includes the build. Do not also set
+`npm run build` as the dashboard build command, which builds twice. Commit the
+lockfile and install with `npm ci` to retain the compatible producer/consumer
+pair. Override the default
 Wrangler deploy command; it targets a different configuration flow. Set public
 build variables for production and preview environments separately.
 

@@ -14,8 +14,9 @@
     "start:vinext": "vite preview",
     "deploy:vinext": "vinext-cloudflare deploy",
     "check:compat": "vinext check",
-    "check:deploy": "vinext-cloudflare deploy --dry-run",
-    "deploy": "vinext-cloudflare deploy"
+    "check:deploy": "npm run build && npm run check:build-output && vinext-cloudflare deploy --dry-run",
+    "deploy": "vinext-cloudflare deploy",
+    "check:build-output": "node ./scripts/check-cloudflare-build.mjs"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.14.0",
@@ -30,14 +31,14 @@
     "vinext": "^1.4.6"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^2.0.0-beta.v.17",
+    "@cloudflare/vite-plugin": "2.0.0-rc.0",
     "@tailwindcss/postcss": "^4.3.5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.3.0",
     "@vitejs/plugin-rsc": "^0.5.39",
-    "cf": "^1.0.0-rc.0",
+    "cf": "1.0.0-rc.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.4",
     "tailwindcss": "^4",

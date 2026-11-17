@@ -44,7 +44,8 @@ keys remain server-only. No credentials are supplied by this repository setup.
 | `npm run typecheck` | Generate vinext/Worker types, then run TypeScript |
 | `npm test` | Node behavioral tests with the actual vinext router shims |
 | `npm run lint` | ESLint over source/configuration |
-| `npm run check:deploy` | Deployment configuration dry run; no build/publish |
+| `npm run check:build-output` | Validate existing output with the deployment CLI’s reader |
+| `npm run check:deploy` | Build, validate output and dry-run setup; no publish |
 | `npm run deploy` | Intentional real Cloudflare deployment, including build |
 
 `dev:vinext`, `build:vinext` and `start:vinext` remain aliases. Next is retained
@@ -98,6 +99,12 @@ cover default. Application CSS and image imports are unchanged. Keep the generat
 static-asset exclusions.
 Application `next/*` imports resolve through vinext without source rewrites.
 
+The Cloudflare producer and deployment CLI are pinned to compatible release
+candidates: `@cloudflare/vite-plugin@2.0.0-rc.0` emits Build Output v1 for
+`cf@1.0.0-rc.0`. Upgrade them together. `check:build-output` resolves the reader
+from `cf` itself, including nested dependencies, rather than assuming that the
+root build-output package is the deployer’s version.
+
 ```text
 src/app/                       Routes, layout and global styles
 src/features/                  Landing, auth, API, live, workspace and audio
@@ -119,7 +126,6 @@ require a preceding Next build. Worker types are generated locally.
 npm test
 npm run lint
 npm run typecheck
-npm run build
 npm run check:deploy
 npm start
 ```
