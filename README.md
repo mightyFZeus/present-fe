@@ -34,6 +34,9 @@ canonical HTTP(S) origin without a path, credentials, query or fragment. Restart
 development or rebuild production after changing public values. Backend provider
 keys remain server-only. No credentials are supplied by this repository setup.
 
+Set `NEXT_PUBLIC_API_BASE_URL` to `https://api.prezntly.xyz` in the Cloudflare
+production build variables.
+
 ## Commands
 
 | Command | Purpose |
