@@ -60,12 +60,21 @@ const slice = createSlice({
         state.publishedSeq = event.transcriptSeq;
       }
       if (event.type === "error") state.error = event.message ?? "Live session error.";
-      if (event.type === "ended") { state.status = "ended"; state.acceptsAudio = false; }
+      if (event.type === "ended") {
+        state.status = "ended";
+        state.acceptsAudio = false;
+        state.error = null;
+      }
     },
     liveFailed(state, action: PayloadAction<string>) {
       state.status = "error"; state.acceptsAudio = false; state.error = action.payload;
     },
-    liveStopped(state) { state.status = "ended"; state.acceptsAudio = false; state.proposal = null; },
+    liveStopped(state) {
+      state.status = "ended";
+      state.acceptsAudio = false;
+      state.proposal = null;
+      state.error = null;
+    },
     liveReset: () => initialState,
   },
 });

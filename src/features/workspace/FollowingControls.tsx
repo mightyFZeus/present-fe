@@ -12,6 +12,7 @@ export function FollowingControls({ slides, ready, controller }: { slides: Prese
   const index = slides.findIndex((slide) => slide.id === w.snapshot?.displayedSlideId);
   const busy = w.mic.status === "permission" || w.mic.status === "connecting";
   const following = w.mic.status === "listening";
+  const error = w.mic.error || (live.status === "error" ? live.error : null);
   const label = w.mic.status === "permission" ? "Waiting for microphone" : w.mic.status === "connecting" ? "Connecting live session" : following ? live.status === "ready" && live.acceptsAudio ? "Following your voice" : "Changing slide" : w.mic.status === "held" ? "Following is on hold" : w.mic.status === "error" ? "Following paused" : "Microphone is off";
   return <section className="following-panel" aria-label="Presentation controls">
     <div className="control-row">
@@ -23,7 +24,7 @@ export function FollowingControls({ slides, ready, controller }: { slides: Prese
       </div>
     </div>
     <div className="listening-status"><span className={`status-dot ${following && live.acceptsAudio ? "active" : ""}`} aria-hidden="true" /><span role="status">{label}</span><meter min="0" max="1" value={w.mic.level} aria-label="Microphone input level" /><span className="privacy-label">Audio streams only while following</span></div>
-    {w.mic.error && <p className="error-text" role="alert">{w.mic.error}</p>}
+    {error && <p className="error-text" role="alert">{error}</p>}
     {following && live.error && <p className="supporting" role="status">{live.error} Following remains active while the connection is ready.</p>}
   </section>;
 }

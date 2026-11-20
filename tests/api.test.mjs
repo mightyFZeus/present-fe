@@ -186,8 +186,71 @@ test("live client authenticates first, gates PCM/Hold and accepts active proposa
   socket.emit(event("ready", { generation: 3, version: 3 }));
   socket.emit(event("ended", { generation: 2, version: 3, acceptsAudio: false }));
   client.sendPcm(new Uint8Array(2));
+});
+
+test("brief audio congestion drops frames without replay and sustained congestion stops following", async (t) => {
+  let now = 0;
+  t.mock.method(performance, "now", () => now);
+  const socket = new Socket();
+  const errors = [];
+  const client = new LiveClient(wireSession(), snapshot, "http://localhost:8080", () => socket, {
+    active: () => true, event() {}, error: (message) => errors.push(message), ended() {},
+  });
+  t.after(() => client.close());
+  const ready = client.connect(); socket.open(); socket.emit(event("ready")); await ready;
   socket.bufferedAmount = 6400;
-  assert.throws(() => client.sendPcm(new Uint8Array(2))); assert.equal(socket.closed, true);
+  client.sendPcm(new Uint8Array([1, 1]));
+  now += 500;
+  client.sendPcm(new Uint8Array([2, 2]));
+  assert.equal(socket.closed, false);
+  assert.equal(socket.sent.length, 1);
+
+  socket.bufferedAmount = 0;
+  client.sendPcm(new Uint8Array([3, 3]));
+  assert.deepEqual(Array.from(new Uint8Array(socket.sent[1])), [3, 3]);
+  assert.equal(socket.sent.length, 2);
+
+  socket.bufferedAmount = 6400;
+  client.sendPcm(new Uint8Array(2));
+  now += 999;
+  client.sendPcm(new Uint8Array(2));
+  assert.equal(socket.closed, false);
+  now += 1;
+  assert.throws(() => client.sendPcm(new Uint8Array(2)), /Audio buffer exceeded/);
+  assert.equal(socket.closed, true);
+  assert.match(errors[0], /could not keep up with the audio/);
+});
+
+test("a bare ended event blocks audio and closes within a short grace period", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const socket = new Socket();
+  const errors = [];
+  const client = new LiveClient(wireSession(), snapshot, "http://localhost:8080", () => socket, {
+    active: () => true, event() {}, error: (message) => errors.push(message), ended() {},
+  });
+  t.after(() => client.close());
+  const ready = client.connect(); socket.open(); socket.emit(event("ready")); await ready;
+  socket.emit(event("ended", { acceptsAudio: false }));
+  assert.throws(() => client.sendPcm(new Uint8Array(2)), /Audio is not currently accepted/);
+  t.mock.timers.tick(499);
+  assert.equal(socket.closed, false);
+  t.mock.timers.tick(1);
+  assert.equal(socket.closed, true);
+  assert.equal(socket.sent.length, 1);
+  assert.match(errors[0], /The live connection ended/);
+});
+
+test("unexpected close reasons do not expose raw peer text", async (t) => {
+  const socket = new Socket();
+  const errors = [];
+  const client = new LiveClient(wireSession(), snapshot, "http://localhost:8080", () => socket, {
+    active: () => true, event() {}, error: (message) => errors.push(message), ended() {},
+  });
+  t.after(() => client.close());
+  const ready = client.connect(); socket.open(); socket.emit(event("ready")); await ready;
+  socket.readyState = 3;
+  socket.onclose({ code: 1008, reason: "unrecognized peer details" });
+  assert.deepEqual(errors, ["The live connection ended. Resume following when ready."]);
 });
 
 test("live operations enforce expiry even when timer callbacks have not run", async (t) => {

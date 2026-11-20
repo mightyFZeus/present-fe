@@ -23,8 +23,8 @@ export const connectLiveSession = createAsyncThunk<
   const owned = () => runtime.isCurrent(generation) && runtime.isLiveIntent(intent);
   const fail = (error: ApiError) => {
     if (owned()) {
-      runtime.cancelLive();
       context.dispatch(error.status === "CANCELLED" ? liveStopped() : liveFailed(error.message));
+      if (owned()) runtime.cancelLive();
     }
     return context.rejectWithValue(error);
   };
@@ -40,14 +40,18 @@ export const connectLiveSession = createAsyncThunk<
   // Tickets are only transient local variables and the socket's one-use auth field.
   const { ticket: _ticket, ...metadata } = session;
   void _ticket;
+  const finish = (message: string) => {
+    if (!owned()) return;
+    context.dispatch(liveFailed(message));
+    if (owned()) runtime.cancelLive();
+  };
   const client: LiveClient = new LiveClient(session, snapshot, runtime.origin!, runtime.socketFactory, {
-    active: (): boolean => runtime.isCurrent(generation) && runtime.isLiveIntent(intent) && runtime.live === client,
+    active: (): boolean => owned() && runtime.live === client,
     event: (event) => {
       context.dispatch(liveEventReceived({ event, at: Date.now() }));
-      if (event.type === "ended" || (event.type === "error" && !event.acceptsAudio)) runtime.cancelLive();
     },
-    error: (message) => { runtime.cancelLive(); context.dispatch(liveFailed(message)); },
-    ended: () => { runtime.cancelLive(); context.dispatch(liveStopped()); },
+    error: finish,
+    ended: () => finish("The live session expired. Resume following when ready."),
   });
   runtime.setLive(client);
   context.dispatch(liveConnecting({ session: metadata, presentationId }));

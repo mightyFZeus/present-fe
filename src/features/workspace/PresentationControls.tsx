@@ -24,7 +24,8 @@ export function PresentationControls({ slides, ready, workspace, controller }: {
   const status = busy ? "Starting" : state.mic.status === "error" ? "Following paused" :
     state.mic.status === "off" ? "Microphone off" : following ?
       live.status === "ready" && live.acceptsAudio ? "Following" : "Changing slide" : "On hold";
-  const error = state.mic.error || view.fullscreenError || live.error;
+  const terminalError = live.status === "error" ? live.error : null;
+  const error = state.mic.error || terminalError || view.fullscreenError || live.error;
   return <div className={`presentation-toolbar ${view.controlsVisible ? "" : "is-hidden"}`} data-presentation-controls inert={!view.controlsVisible} aria-hidden={!view.controlsVisible}>
     <div className="presentation-control-row" role="toolbar" aria-label="Presentation controls">
       <button className="presentation-workspace-button" onClick={() => void controller.exit()}><ArrowLeft size={16} aria-hidden="true" /> Presenter controls</button>

@@ -36,6 +36,7 @@ class Socket {
   readyState = 0; bufferedAmount = 0; sent = []; closed = false;
   send(data) { this.sent.push(data); }
   close() { this.closed = true; this.readyState = 3; this.onclose?.({ code: 1000 }); }
+  serverClose(code, reason) { this.closed = true; this.readyState = 3; this.onclose?.({ code, reason }); }
   open() { this.readyState = 1; this.onopen?.(); }
   emit(value) { this.onmessage?.({ data: JSON.stringify(value) }); }
 }
@@ -380,13 +381,88 @@ test("denied permission never opens provider and old worklet error cannot stop a
   let denied = true; const streams = [];
   const c = capture(t, f, () => { if (denied) return Promise.reject(new DOMException("Denied", "NotAllowedError")); const s = stream(); streams.push(s); return Promise.resolve(s); });
   await c.controller.start(); assert.equal(f.calls.filter((call) => call.url !== "/v1/users/auth/logout").length, 0); assert.equal(f.store.getState().workspace.mic.status, "error");
-  denied = false; const first = c.controller.start(); await finishReady(f, first);
+  denied = false; const first = c.controller.start(); const firstSocket = await finishReady(f, first);
+  const lateClose = firstSocket.onclose;
   const oldHandler = c.nodes[0].onprocessorerror; c.controller.stop(); assert.equal(c.nodes[0].onprocessorerror, null);
-  const second = c.controller.start(); await until(() => f.sockets.length === 2); await finishReady(f, second);
+  const second = c.controller.start(); await until(() => f.sockets.length === 2); const socket = await finishReady(f, second);
   oldHandler(); assert.equal(streams[1].track.stopped, 0); assert.equal(f.store.getState().workspace.mic.status, "listening");
-  f.sockets.at(-1).emit(event("ended", { version: f.store.getState().workspace.snapshot.version, acceptsAudio: false }));
+  lateClose({ code: 1011, reason: "transcription unavailable" });
+  assert.equal(f.store.getState().live.error, null);
+  const node = c.nodes.at(-1);
+  socket.readyState = 2;
+  node.port.onmessage({ data: {
+    type: "pcm", revision: node.port.messages.at(-1).revision, time: 1, buffer: new ArrayBuffer(640),
+  } });
+  assert.equal(streams[1].track.stopped, 0);
+  assert.equal(socket.sent.length, 1);
+  socket.emit(event("ended", { version: f.store.getState().workspace.snapshot.version, acceptsAudio: false }));
   assert.equal(streams[1].track.stopped, 1); assert.equal(c.contexts.at(-1).closed, true);
-  assert.equal(f.store.getState().workspace.snapshot.held, true); assert.equal(f.store.resources.live, undefined);
+  assert.equal(f.store.getState().workspace.snapshot.held, true);
+  assert.equal(socket.closed, false);
+  socket.serverClose(1008, "audio rate exceeded");
+  assert.equal(f.store.resources.live, undefined);
+  assert.match(f.store.getState().live.error, /The server received audio too quickly/);
+});
+test("a terminal speech provider error stops the microphone and preserves the reason", async (t) => {
+  const f = fixture(t, () => ({ data: wireSession() })); await readyDeck(f.store);
+  const tracks = stream(); const c = capture(t, f, () => Promise.resolve(tracks));
+  const operation = c.controller.start(); const socket = await finishReady(f, operation);
+  socket.emit(event("error", {
+    version: f.store.getState().workspace.snapshot.version,
+    code: "transcription_unavailable",
+    message: "provider detail",
+    acceptsAudio: false,
+  }));
+  assert.equal(tracks.track.stopped, 1);
+  assert.equal(f.store.resources.live, undefined);
+  assert.equal(f.store.getState().workspace.mic.error, "Speech recognition is unavailable. Resume following to try again.");
+  assert.equal(f.store.getState().workspace.snapshot.held, true);
+});
+test("sustained audio congestion keeps its error after microphone cleanup", async (t) => {
+  const f = fixture(t, () => ({ data: wireSession() })); await readyDeck(f.store);
+  const tracks = stream(); const c = capture(t, f, () => Promise.resolve(tracks));
+  const operation = c.controller.start(); const socket = await finishReady(f, operation);
+  const node = c.nodes[0];
+  const sendAudio = () => node.port.onmessage({ data: {
+    type: "pcm", revision: node.port.messages.at(-1).revision, time: 1, buffer: new ArrayBuffer(640),
+  } });
+  let now = 0;
+  t.mock.method(performance, "now", () => now);
+  socket.bufferedAmount = 6400;
+  sendAudio();
+  assert.equal(f.store.getState().workspace.mic.status, "listening");
+  now += 1000;
+  sendAudio();
+  assert.equal(tracks.track.stopped, 1);
+  assert.equal(f.store.resources.live, undefined);
+  assert.match(f.store.getState().workspace.mic.error, /could not keep up with the audio/);
+});
+test("hiding the presenter tab stops capture and waits for explicit resume", async (t) => {
+  const f = fixture(t, () => ({ data: wireSession() })); await readyDeck(f.store);
+  const tracks = stream(); const c = capture(t, f, () => Promise.resolve(tracks));
+  const document = Object.assign(new EventTarget(), { hidden: false });
+  const previousDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
+  Object.defineProperty(globalThis, "document", { value: document, configurable: true });
+  const workspace = new WorkspaceController(f.store);
+  workspace.capture = c.controller;
+  workspace.attach();
+  t.after(() => {
+    workspace.detach();
+    if (previousDocument) Object.defineProperty(globalThis, "document", previousDocument);
+    else delete globalThis.document;
+  });
+  const operation = workspace.capture.start(); const socket = await finishReady(f, operation);
+
+  document.hidden = true;
+  document.dispatchEvent(new Event("visibilitychange"));
+  assert.equal(tracks.track.stopped, 1);
+  assert.equal(socket.closed, true);
+  assert.equal(f.store.getState().workspace.mic.status, "held");
+
+  document.hidden = false;
+  document.dispatchEvent(new Event("visibilitychange"));
+  assert.equal(f.sockets.length, 1);
+  assert.equal(f.store.getState().workspace.snapshot.held, true);
 });
 test("terminal cleanup clears expired auth immediately even when its timer is delayed", async (t) => {
   const f = fixture(t, () => ({ data: wireSession() })); await readyDeck(f.store);

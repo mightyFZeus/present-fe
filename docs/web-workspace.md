@@ -118,8 +118,11 @@ closes the live session. Hidden tabs/pagehide, device loss, processing failure,
 terminal connection errors, logout, account change and expiry stop capture; resume
 is always explicit. Recoverable matching errors with acceptsAudio true keep
 capture active and show a message. Snapshot changes reset DSP partial buffers;
-revision/time/readiness guards reject queued obsolete audio. Bounded transport
-backpressure pauses the session rather than buffering old speech for replay.
+revision/time/readiness guards reject queued obsolete audio. When the audio send
+buffer is full, the browser drops new audio frames. If the buffer stays full for
+one second, following stops. Capture stops as soon as the server ends the session.
+The browser waits briefly for the server's close reason and shows a specific
+message for known reasons.
 
 Microphone APIs require a secure context (localhost is accepted). Browser/device
 permission and real provider connectivity still need user testing. No audio,

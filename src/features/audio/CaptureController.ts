@@ -73,7 +73,7 @@ export class CaptureController {
     op.context.onstatechange = null;
     void op.context.close().catch(() => {});
   }
-  private externalStop(op: Operation) {
+  private externalStop(op: Operation, awaitingClose = false) {
     const state = this.store.getState();
     const active = this.operation === op && !op.cancelled &&
       state.auth.generation === op.auth && state.workspace.deckIntent === op.deck &&
@@ -84,10 +84,13 @@ export class CaptureController {
       this.store.dispatch(sessionCleared({ reason: "Session expired." }));
       return;
     }
-    if (this.store.getState().auth.accessToken) {
-      this.markHeld();
-      this.store.dispatch(micChanged({ status: "error", error: "The live connection ended. Start following when you are ready." }));
-    }
+    this.markHeld();
+    const current = this.store.getState();
+    if (this.operation || current.auth.generation !== op.auth || current.workspace.deckIntent !== op.deck) return;
+    const error = awaitingClose ? undefined :
+      (state.live.status === "error" && state.live.error) ||
+      "The live connection ended. Start following when you are ready.";
+    this.store.dispatch(micChanged({ status: "error", error }));
   }
   private markHeld() {
     const s = this.store.getState().workspace.snapshot;
@@ -166,14 +169,21 @@ export class CaptureController {
     if (value.type === "pcm" && value.buffer instanceof ArrayBuffer &&
         typeof value.time === "number" && op.context.currentTime - value.time <= 0.2) {
       try { sendLivePcm(this.store, value.buffer); }
-      catch { this.hold("The connection could not keep up. Resume when it is stable.", true); }
+      catch {
+        if (this.valid(op)) this.hold("The connection could not keep up. Resume when it is stable.", true);
+      }
     }
   }
 
   sync() {
     const op = this.operation; if (!op) return;
-    if (!this.valid(op)) return;
     const state = this.store.getState(); const s = state.workspace.snapshot; const live = state.live;
+    if (op.sessionId && live.session?.sessionId === op.sessionId &&
+        (live.status === "ended" || live.status === "error")) {
+      this.externalStop(op, live.status === "ended");
+      return;
+    }
+    if (!this.valid(op)) return;
     if (!op.listening && s?.version !== op.version) { this.hold("Following paused after navigation. Start again when ready.", true); return; }
     if (!op.node || !s) return;
     const enabled = live.status === "ready" && live.acceptsAudio && !s.held &&
