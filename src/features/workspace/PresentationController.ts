@@ -179,7 +179,6 @@ export class PresentationController {
     this.store.dispatch(presentationFullscreenChanged(active && owned));
   };
   private keydown = (event: KeyboardEvent) => {
-    if (this.root?.querySelector("[data-presenter-voice-dialog][open]")) return;
     const view = selectPresentation(this.store.getState());
     if (!view.active) return;
     const hiddenTab = event.key === "Tab" && !view.controlsVisible;

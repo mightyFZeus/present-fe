@@ -98,7 +98,7 @@ export class CaptureController {
   }
 
   // Warm the context in the click; acquire muted permission before opening a paid stream.
-  async start(presenterVoiceId?: string) {
+  async start() {
     const state = this.store.getState();
     const deck = state.workspace.deck; const snapshot = state.workspace.snapshot;
     const ready = deck ? presentationsApi.endpoints.getPresentation.select(deck.id)(state).data?.status === "ready" : false;
@@ -129,11 +129,7 @@ export class CaptureController {
       // then rebind this operation's live cleanup immediately after that transition.
       op.unbindLive?.(); op.unbindLive = undefined;
       this.store.dispatch(micChanged({ status: "connecting" }));
-      const connection = this.store.dispatch(connectLiveSession({
-        presentationId: deck.id,
-        snapshot: next,
-        presenterVoiceId,
-      }));
+      const connection = this.store.dispatch(connectLiveSession({ presentationId: deck.id, snapshot: next }));
       op.abort = connection.abort;
       if (!this.valid(op)) { connection.abort(); return; }
       op.unbindLive = this.store.resources.registerCleanup("live", () => this.externalStop(op));

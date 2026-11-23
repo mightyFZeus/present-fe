@@ -11,7 +11,6 @@ export interface AxiosQueryArgs {
   url: string;
   method?: Method;
   data?: unknown;
-  contentType?: "application/octet-stream";
   authenticated?: boolean;
   /** Only the fixed browser-auth endpoints may include cookies. */
   cookieSession?: boolean;

@@ -10,10 +10,8 @@ import { livePreparing, liveConnecting, liveEventReceived, liveFailed, liveStopp
 import type { LiveSessionMetadata, NavigationSnapshot } from "./liveTypes";
 
 export const connectLiveSession = createAsyncThunk<
-  LiveSessionMetadata,
-  { presentationId: string; snapshot: NavigationSnapshot; presenterVoiceId?: string },
-  ApiThunkConfig
->("live/connect", async ({ presentationId, snapshot, presenterVoiceId }, context) => {
+  LiveSessionMetadata, { presentationId: string; snapshot: NavigationSnapshot }, ApiThunkConfig
+>("live/connect", async ({ presentationId, snapshot }, context) => {
   if (!validSnapshot(snapshot)) return context.rejectWithValue({ status: 400, message: "A valid navigation snapshot is required." });
   let path: string;
   try { path = `${presentationPath(presentationId)}/live-sessions`; }
@@ -31,11 +29,7 @@ export const connectLiveSession = createAsyncThunk<
     return context.rejectWithValue(error);
   };
   if (context.signal.aborted || !owned()) return fail({ status: "CANCELLED", message: "The live connection was cancelled." });
-  const result = await request({
-    url: path,
-    method: "POST",
-    data: presenterVoiceId ? { presenterVoiceId } : {},
-  }, context);
+  const result = await request({ url: path, method: "POST", data: {} }, context);
   if (result.error) return fail(result.error);
   const session = runtime.origin ? readLiveSession(unwrapData(result.data), runtime.origin) : undefined;
   if (!runtime.isCurrent(generation) || !runtime.isLiveIntent(intent)) {

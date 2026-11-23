@@ -13,7 +13,6 @@ const { Provider } = load("react-redux");
 const { AppRouterContext } = await import("vinext/shims/internal/app-router-context");
 const { makeStore } = load("../src/store/store.ts");
 const { api } = load("../src/store/services/api.ts");
-const { presenterVoiceApi } = load("../src/features/presenter-voice/presenterVoiceApi.ts");
 const { AuthGate } = load("../src/features/auth/AuthGate.tsx");
 // The home link is a DOM boundary, not the auth route under test. Preserve its
 // anchor semantics without running Next's browser-only intersection/prefetch
@@ -34,9 +33,7 @@ function deferred(){let resolve;const promise=new Promise((a)=>{resolve=a;});ret
 async function until(check){const end=Date.now()+1200;while(!check()){if(Date.now()>end)throw new Error("Async condition did not occur");await new Promise(setImmediate);}}
 function fixture(t,handler=async(config)=>config.url.endsWith("/logout")?{data:{signedOut:true}}:{data:{accessToken:token(),expiresIn:3500,user}}){
  const calls=[];const client=axios.create({adapter:async(config)=>{
-  calls.push(config);
-  const data = config.url.endsWith("/me/presenter-voice")
-    ? { data: { enabled: false, enrolled: false } } : await handler(config);
+  calls.push(config);const data=await handler(config);
   const response={status:data?.httpError??200,statusText:"OK",headers:{},config,data:data?.httpError?{error:"Unavailable"}:data};
   if(data?.httpError)throw new axios.AxiosError("Request failed","ERR_BAD_RESPONSE",config,undefined,response);
   return response;
@@ -45,11 +42,6 @@ function fixture(t,handler=async(config)=>config.url.endsWith("/logout")?{data:{
  return {store,calls};
 }
 function authenticate(store,expiresAt=Date.now()+3500000){const a=store.getState().auth;store.dispatch(sessionEstablished({generation:a.generation,attempt:a.loginAttempt,accessToken:token(),expiresAt,user}));}
-async function loadVoiceStatus(store) {
-  const query = store.dispatch(presenterVoiceApi.endpoints.presenterVoiceStatus.initiate());
-  await query.unwrap();
-  query.unsubscribe();
-}
 function readyAnonymous(store){const a=store.getState().auth;store.dispatch(restoreFinished({generation:a.generation,attempt:a.loginAttempt}));}
 function renderer(t,store){
  const original=React.useEffect;let effects=[];const replacements=[];
@@ -67,16 +59,13 @@ test("actual AuthGate never mounts workspace during bootstrap, then admits verif
  const controller=new AuthSessionController(f.store);controller.attach();t.after(()=>controller.detach());await until(()=>f.calls.length===1);
  result=r.render(gate());r.commit(result);assert.equal(mounts,0);assert.deepEqual(r.replacements,[]);
  pending.resolve({data:{accessToken:token(),expiresIn:3500,user}});await until(()=>!!f.store.getState().auth.accessToken);
- result=r.render(gate());assert.doesNotMatch(result.html,/Private workspace/);
- await loadVoiceStatus(f.store);
- result=r.render(gate());r.commit(result);assert.match(result.html,/Private workspace/);
- assert.equal(mounts,1);assert.deepEqual(r.replacements,[]);assert.equal(f.calls.length,2);
+ result=r.render(gate());r.commit(result);assert.match(result.html,/Private workspace/);assert.equal(mounts,1);assert.deepEqual(r.replacements,[]);assert.equal(f.calls.length,1);
 });
 
 test("missing, logout and cross-tab auth changes remove protected children and replace to login",async(t)=>{
  const f=fixture(t);const r=renderer(t,f.store);const protectedTree=React.createElement(AuthGate,null,React.createElement("div",null,"Private workspace"));
  readyAnonymous(f.store);let result=r.render(protectedTree);assert.doesNotMatch(result.html,/Private workspace/);r.commit(result);assert.equal(r.replacements.at(-1),"/login");
- authenticate(f.store);await loadVoiceStatus(f.store);result=r.render(protectedTree);assert.match(result.html,/Private workspace/);
+ authenticate(f.store);result=r.render(protectedTree);assert.match(result.html,/Private workspace/);
  let closed=0;f.store.resources.registerCleanup("session",()=>closed++);
  await f.store.dispatch(logout());assert.equal(closed,1);result=r.render(protectedTree);assert.doesNotMatch(result.html,/Private workspace/);r.commit(result);assert.equal(r.replacements.at(-1),"/login");
  authenticate(f.store);let channel;const controller=new AuthSessionController(f.store,{channel:()=>channel={onmessage:null,postMessage(){},close(){}}});controller.attach();t.after(()=>controller.detach());
@@ -149,29 +138,9 @@ test("provider replay keeps a protected presentation pending between detach and 
   controller.attach();
   pending.resolve({ data: { accessToken: token(), expiresIn: 3500, user } });
   await until(() => !!f.store.getState().auth.accessToken);
-  await loadVoiceStatus(f.store);
   const restored = r.render(protectedDeck);
   r.commit(restored);
   assert.match(restored.html, /Protected presentation aaaaaaaa/);
   assert.deepEqual(r.replacements, []);
   assert.equal(f.calls.some((call) => call.url.endsWith("/logout")), false);
-});
-
-test("voice enrollment blocks protected routes until saved", async (t) => {
-  const { store } = fixture(t);
-  authenticate(store);
-  const { render } = renderer(t, store);
-  const protectedPage = React.createElement(AuthGate, null, React.createElement("div", null, "Private workspace"));
-  const enroll = (enrolled) => store.dispatch(
-    presenterVoiceApi.util.upsertQueryData("presenterVoiceStatus", undefined, { enabled: true, enrolled }),
-  );
-
-  await enroll(false);
-  const pending = render(protectedPage).html;
-  assert.match(pending, /Record 10 seconds/);
-  assert.match(pending, /Sign out/);
-  assert.doesNotMatch(pending, /Private workspace|Skip|Close|Dismiss/);
-
-  await enroll(true);
-  assert.match(render(protectedPage).html, /Private workspace/);
 });

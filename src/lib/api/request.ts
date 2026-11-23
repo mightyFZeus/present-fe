@@ -55,10 +55,7 @@ export async function request(
       data: args.data,
       responseType: args.responseType ?? "json",
       timeout: args.timeoutMs ?? 15_000,
-      headers: {
-        ...(authenticated ? { Authorization: `Bearer ${token}` } : {}),
-        ...(args.contentType ? { "Content-Type": args.contentType } : {}),
-      },
+      headers: authenticated ? { Authorization: `Bearer ${token}` } : undefined,
       signal: scope?.signal,
       withCredentials: args.cookieSession === true,
     });
