@@ -1,18 +1,21 @@
 "use client";
 import { ArrowLeft, ChevronLeft, ChevronRight, CornerUpLeft, Maximize, Mic, Minimize, Pause, Square } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
+import type { PresenterVoiceControls } from "@/features/presenter-voice/PresenterVoiceOverride";
 import type { PresentationSlide } from "@/features/presentations/presentationTypes";
 import type { WorkspaceController } from "./WorkspaceController";
 import type { PresentationController } from "./PresentationController";
 import { selectPresentation } from "./presentationSlice";
 
-export function PresentationControls({ slides, ready, workspace, controller }: {
+export function PresentationControls({ slides, ready, voice, workspace, controller }: {
   slides: PresentationSlide[];
   ready: boolean;
+  voice?: PresenterVoiceControls | null;
   workspace: WorkspaceController;
   controller: PresentationController;
 }) {
   const view = useAppSelector(selectPresentation);
+  const start = () => voice ? voice.start() : void workspace.capture.start();
   const state = useAppSelector((value) => value.workspace);
   const live = useAppSelector((value) => value.live);
   const authenticated = useAppSelector((value) => !!value.auth.accessToken);
@@ -35,9 +38,10 @@ export function PresentationControls({ slides, ready, workspace, controller }: {
         <button aria-label="Next slide" disabled={index < 0 || index >= slides.length - 1} onClick={() => workspace.navigate(slides[index + 1].id)}><ChevronRight size={20} aria-hidden="true" /></button>
         {state.snapshot?.returnPointId && <button aria-label="Return to main slide" onClick={() => workspace.navigate(state.snapshot!.returnPointId!)}><CornerUpLeft size={17} aria-hidden="true" /></button>}
       </div>
-      <span className="presentation-status" role="status"><span className={`status-dot ${following && live.acceptsAudio ? "active" : ""}`} aria-hidden="true" />{status}</span>
+      <span className="presentation-status" role="status"><span className={`status-dot ${following && live.acceptsAudio ? "active" : ""}`} aria-hidden="true" />{`${status}${voice?.guest ? " · Guest voice" : ""}`}</span>
+      {voice && <button type="button" disabled={!ready || busy} onClick={voice.change}><Mic size={17} aria-hidden="true" /><span>Change presenter voice</span></button>}
       {following ? <button onClick={() => workspace.capture.hold()}><Pause size={17} aria-hidden="true" /><span>Hold</span></button> :
-        <button disabled={!authenticated || !ready || !state.snapshot || busy} onClick={() => void workspace.capture.start()}><Mic size={17} aria-hidden="true" /><span>{busy ? "Starting" : paused ? "Resume" : "Follow"}</span></button>}
+        <button disabled={!authenticated || !ready || !state.snapshot || busy} onClick={start}><Mic size={17} aria-hidden="true" /><span>{busy ? "Starting" : paused ? "Resume" : "Follow"}</span></button>}
       <button aria-label={busy ? "Cancel microphone startup" : "Stop following"} disabled={!busy && state.mic.status !== "listening" && state.mic.status !== "held" && state.mic.status !== "error"} onClick={() => workspace.capture.stop()}><Square size={16} aria-hidden="true" /></button>
       <button aria-label={view.fullscreen ? "Exit full screen" : "Enter full screen"} onClick={() => void controller.toggleFullscreen()}>{view.fullscreen ? <Minimize size={18} aria-hidden="true" /> : <Maximize size={18} aria-hidden="true" />}</button>
     </div>

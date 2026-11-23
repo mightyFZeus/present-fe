@@ -15,6 +15,9 @@ const { uploadPresentation, loadPresentationSource, loadSlideImage, releaseAsset
 const { connectLiveSession, stopLiveSession } = load("../src/features/live/liveThunks.ts");
 const { LiveClient } = load("../src/features/live/LiveClient.ts");
 const requestModule = load("../src/lib/api/request.ts");
+const { presenterVoiceApi, saveAccountVoice, saveGuestVoice } = load(
+  "../src/features/presenter-voice/presenterVoiceApi.ts",
+);
 
 const ID = "11111111-1111-4111-8111-111111111111";
 const SLIDE = "22222222-2222-4222-8222-222222222222";
@@ -383,4 +386,39 @@ test("live snapshots follow backend deck capacity without a duplicate frontend c
   assert.equal(validSnapshot({ ...current, visitedSlideIds: [...visited.slice(1), "invalid"] }), false);
   assert.equal(validSnapshot({ ...current, visitedSlideIds: visited.slice(0, 24) }), false);
   assert.equal(validSnapshot({ ...current, displayedSlideId: ID }), false);
+});
+
+test("presenter voice status and samples use authenticated routes and raw PCM", async (t) => {
+  const accessToken = token();
+  const guest = { presenterVoiceId: SESSION, expiresAt: new Date(Date.now() + 60_000).toISOString() };
+  const { store, calls } = fixture(t, ({ url, method }) => {
+    if (url.endsWith("/auth/google")) return { data: { accessToken, expiresIn: 3600, user: user() } };
+    if (url.endsWith("/me/presenter-voice")) {
+      return { data: { enabled: true, enrolled: method === "put" } };
+    }
+    return { data: guest };
+  });
+  await login(store);
+  const status = store.dispatch(presenterVoiceApi.endpoints.presenterVoiceStatus.initiate());
+  t.after(() => status.unsubscribe());
+  assert.deepEqual(await status.unwrap(), { enabled: true, enrolled: false });
+
+  const sample = new ArrayBuffer(320_000);
+  const { signal } = new AbortController();
+  await store.dispatch(saveAccountVoice(sample, signal));
+  assert.deepEqual(
+    presenterVoiceApi.endpoints.presenterVoiceStatus.select()(store.getState()).data,
+    { enabled: true, enrolled: true },
+  );
+  assert.deepEqual(await store.dispatch(saveGuestVoice(ID, sample, signal)), guest);
+  assert.deepEqual(calls.slice(1).map(({ url, method }) => [method, url]), [
+    ["get", "/v1/users/me/presenter-voice"],
+    ["put", "/v1/users/me/presenter-voice"],
+    ["post", `/v1/presentations/${ID}/presenter-voice`],
+  ]);
+  for (const call of calls.slice(2)) {
+    assert.equal(call.headers.get("Authorization"), `Bearer ${accessToken}`);
+    assert.equal(call.headers.get("Content-Type"), "application/octet-stream");
+    assert.equal(call.data, sample);
+  }
 });

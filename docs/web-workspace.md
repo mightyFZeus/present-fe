@@ -237,3 +237,19 @@ per-file actions are respected across routes. Leaving the library or changing
 accounts stops queued work; already-started same-account CRUD still records its
 outcome through the existing owner guards. Selection/confirmation are transient
 and clear on route exit or account change. Opening a card stays a separate link.
+
+## Presenter voice setup
+
+When the backend enables speaker verification, new and existing accounts record a
+10-second sample after sign-in. Both workspace routes require a saved voice.
+The setup page provides sign-out and retry. It starts the microphone when the user
+chooses Record.
+
+Change presenter voice appears next to Following in both presenter views. A guest
+records a temporary sample for that deck. Resume uses the selected voice. If the
+guest sample expires, record a new sample or choose Use my saved voice.
+Leaving the presentation clears the local guest selection.
+
+The web client uses the same 16 kHz mono PCM encoder as live following. The
+microphone stops before the upload begins. The app keeps the sample out of Redux
+and browser storage. Deploy the account status route before this web client.

@@ -9,8 +9,6 @@ import { orderedSlides } from "./navigationHelpers";
 import { canonicalPresentationId, isPresentationId } from "./libraryHelpers";
 import { SlideList } from "./SlideList";
 import { SlideStage } from "./SlideStage";
-import { FollowingControls } from "./FollowingControls";
-import { RecentSpeech } from "./RecentSpeech";
 import { PresentationFocus } from "./PresentationFocus";
 import { deckRenamed } from "./workspaceSlice";
 import { selectPresentation } from "./presentationSlice";
@@ -95,10 +93,8 @@ export function Workspace({ presentationId }: { presentationId?: string } = {}) 
         </div>}
         <SlideList slides={slides} controller={controller} />
       </aside>
-        <PresentationFocus slides={slides} ready={presentation?.status === "ready" && slides.length > 0} workspace={controller}>
+        <PresentationFocus presentationId={id} slides={slides} ready={presentation?.status === "ready" && slides.length > 0} workspace={controller}>
           <SlideStage deck={presentation} slides={slides} loading={!!id && (metadata.isFetching && !presentation || presentation?.status === "ready" && slideQuery.isFetching && !slides.length)} error={!!metadata.error || !!slideQuery.error} retry={() => { if (presentation?.status === "ready") void slideQuery.refetch(); else void metadata.refetch(); }} controller={controller} />
-          <FollowingControls slides={slides} ready={presentation?.status === "ready" && slides.length > 0} controller={controller} />
-          <RecentSpeech />
         </PresentationFocus>
       </main>}
   </div>;
