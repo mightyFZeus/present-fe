@@ -1,7 +1,8 @@
+import { BrandMark } from "@/components/BrandMark";
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, LogOut, Presentation, UserRound } from "lucide-react";
+import { ArrowLeft, LogOut, UserRound } from "lucide-react";
 import { BackendStatus } from "@/components/BackendStatus";
 import { googleIdentity } from "@/features/auth/googleIdentity";
 import { logout } from "@/features/auth/authThunks";
@@ -12,7 +13,7 @@ export function WorkspaceHeader({ presenter = false }: { presenter?: boolean }) 
   const user = useAppSelector((state) => state.auth.user);
   return <header className="workspace-header">
     <Link href="/" className="brand" aria-label="Prezntly home">
-      <span className="brand-mark"><Presentation size={20} strokeWidth={1.5} aria-hidden="true" /></span>
+      <BrandMark />
       <span>Prezntly</span>
     </Link>
     {presenter ? <Link href="/workspace" className="workspace-back" aria-label="Back to workspace" prefetch={false}>

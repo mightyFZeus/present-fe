@@ -1,32 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <title>Prezntly</title>
-  <!--
-    Presentation geometry from Lucide.
-    ISC License — Copyright (c) 2026 Lucide Icons and Contributors
-
-    Permission to use, copy, modify, and/or distribute this software for any
-    purpose with or without fee is hereby granted, provided that the above
-    copyright notice and this permission notice appear in all copies.
-
-    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-  -->
-  <rect width="32" height="32" rx="7" fill="#081112" />
-  <g
-    transform="translate(4 4)"
-    fill="none"
-    stroke="#97ccae"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  >
-    <path d="M2 3h20" />
-    <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" />
-    <path d="m7 21 5-5 5 5" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Prezntly Cadence">
+  <title>Prezntly Cadence</title>
+  <rect width="96" height="96" rx="20" fill="#081112"/>
+  <path class="cadence-segment cadence-first"
+    d="M12 44Q12 40 16 40H19Q23 40 23 44V52Q23 56 19 56H16Q12 56 12 52Z"
+    fill="#edebe2" fill-rule="evenodd"/>
+  <path class="cadence-segment cadence-second"
+    d="M30 26Q30 22 34 22H37Q41 22 41 26V70Q41 74 37 74H34Q30 74 30 70Z"
+    fill="#edebe2" fill-rule="evenodd"/>
+  <path class="cadence-segment cadence-third"
+    d="M48 36Q48 32 52 32H55Q59 32 59 36V60Q59 64 55 64H52Q48 64 48 60Z"
+    fill="#edebe2" fill-rule="evenodd"/>
+  <path class="cadence-segment cadence-slide"
+    d="M67 34H85V62H67Z M73 40V56H79V40Z"
+    fill="#97ccae" fill-rule="evenodd"/>
 </svg>
