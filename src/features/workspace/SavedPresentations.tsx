@@ -8,6 +8,7 @@ import type { PresentationSummary } from "@/features/presentations/presentationT
 import { useAppSelector, useAppStore } from "@/store/hooks";
 import { presentationHref, visibleSavedPresentations } from "./libraryHelpers";
 import { UploadPanel } from "./UploadPanel";
+import { DeckPreparationMark } from "./DeckPreparationMark";
 import type { WorkspaceController } from "./WorkspaceController";
 
 const statusLabels = {
@@ -123,6 +124,25 @@ function SavedPresentationCard({
     }
   };
 
+  const preparing = presentation.status === "queued" || presentation.status === "processing";
+  const cardContent = <>
+        <span className={`saved-cover${preparing ? " is-preparing" : ""}`} aria-hidden="true">
+          {preparing ?
+            <DeckPreparationMark queued={presentation.status === "queued"} /> : <>
+          <span className="saved-cover-format"><FileText size={15} strokeWidth={1.5} />{presentation.format.toUpperCase()}</span>
+          <span className="saved-cover-title">{presentation.filename.replace(/\.(pdf|pptx)$/i, "")}</span>
+          <span className="saved-cover-bottom"><span>PREZNTLY / DECK</span><ArrowUpRight size={20} /></span>
+          </>}
+        </span>
+        <span className="saved-file-copy">
+          <span className={`saved-status ${presentation.status}`}>
+            <span className="status-dot" aria-hidden="true" />{statusLabels[presentation.status]}
+          </span>
+          <strong title={presentation.filename}>{presentation.filename}</strong>
+          <span className="saved-open-label">{preparing ? "Available when ready" : presentation.status === "ready" ? "Open presentation" : "View preparation status"}{!preparing && <ArrowUpRight size={14} aria-hidden="true" />}</span>
+        </span>
+  </>;
+
   return <li ref={row} className={`saved-presentation${selected ? " is-selected" : ""}`}>
     {mode === "view" && <label className="saved-select">
       <input
@@ -177,7 +197,9 @@ function SavedPresentationCard({
         </button>
       </div>
     </div> : <>
-      <Link
+      {preparing ? <div className="saved-open is-disabled" aria-disabled="true">
+        {cardContent}
+      </div> : <Link
         href={presentationHref(presentation.id)}
         prefetch={false}
         className="saved-open"
@@ -194,19 +216,8 @@ function SavedPresentationCard({
           }
         }}
       >
-        <span className="saved-cover" aria-hidden="true">
-          <span className="saved-cover-format"><FileText size={15} strokeWidth={1.5} />{presentation.format.toUpperCase()}</span>
-          <span className="saved-cover-title">{presentation.filename.replace(/\.(pdf|pptx)$/i, "")}</span>
-          <span className="saved-cover-bottom"><span>PREZNTLY / DECK</span><ArrowUpRight size={20} /></span>
-        </span>
-        <span className="saved-file-copy">
-          <span className={`saved-status ${presentation.status}`}>
-            <span className="status-dot" aria-hidden="true" />{statusLabels[presentation.status]}
-          </span>
-          <strong title={presentation.filename}>{presentation.filename}</strong>
-          <span className="saved-open-label">{presentation.status === "ready" ? "Open presentation" : "View preparation status"}<ArrowUpRight size={14} aria-hidden="true" /></span>
-        </span>
-      </Link>
+        {cardContent}
+      </Link>}
       <div className="saved-row-footer">
         <span className="saved-file-meta">
           {presentation.format.toUpperCase()}

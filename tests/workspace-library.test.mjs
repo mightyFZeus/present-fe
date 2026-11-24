@@ -100,7 +100,8 @@ test("saved list encodes opaque cursors, sends Bearer and renders real statuses"
   await list(f.store, { direction: "forward" }).unwrap();
   assert.deepEqual(visible(f.store).map((row) => row.id), [ID, OTHER]);
   assert.match(html(f), /Preparing/);
-  assert.match(html(f), /View status for Fictional follow-up.pptx/);
+  assert.match(html(f), /Available when ready/);
+  assert.doesNotMatch(html(f), new RegExp(`<a[^>]+href="/workspace/${OTHER}"`));
   assert.doesNotMatch(html(f), /Load more/);
   assert.equal(new URL(f.calls[1].url, "http://localhost").searchParams.get("cursor"), cursor);
   assert.equal(f.calls[0].headers.get("Authorization"), "Bearer private-memory-test-token");
@@ -318,4 +319,27 @@ test("successful upload invalidates the subscribed saved library", async (t) => 
   await until(() => visible(f.store).some((row) => row.id === OTHER));
   assert.equal(reads, 2);
   assert.equal(visible(f.store)[0].status, "queued");
+});
+
+
+test("Cadence preparation follows backend status and disappears on ready or failed", async (t) => {
+  let status = "queued";
+  const f = fixture(t, () => reply({ data: page({ ...deck(), status }) }));
+  for (const next of ["queued", "processing", "ready", "failed"]) {
+    status = next;
+    await list(f.store, { forceRefetch: true }).unwrap();
+    const markup = html(f);
+    if (next === "queued" || next === "processing") {
+      assert.match(markup, /deck-preparation-logo/);
+      assert.match(markup, next === "queued" ? /Your deck is in line/ : /Finding the flow/);
+      assert.match(markup, /Available when ready/);
+      assert.match(markup, /class="saved-open is-disabled" aria-disabled="true"/);
+      assert.doesNotMatch(markup, new RegExp(`<a[^>]+href="/workspace/${ID}"`));
+      assert.doesNotMatch(markup, /saved-cover-title/);
+    } else {
+      assert.doesNotMatch(markup, /deck-preparation-logo/);
+      assert.match(markup, /saved-cover-title/);
+      assert.match(markup, next === "ready" ? /Open presentation/ : /Preparation failed/);
+    }
+  }
 });
