@@ -303,3 +303,31 @@ test("upload handoff routes only accepted current success, never failures or lat
     control.unmount();
   }
 });
+
+
+test("library upload stays in the library while the accepted deck prepares", async (t) => {
+  const f = fixture(t, () => reply({ data: { ...deck(A), status: "queued" } }, 202));
+  const original = { memo: React.useMemo, effect: React.useEffect, store: hooks.useAppStore };
+  React.useMemo = (create) => create();
+  React.useEffect = () => {};
+  hooks.useAppStore = () => f.store;
+  let library;
+  try {
+    library = PresentationLibrary();
+  } finally {
+    React.useMemo = original.memo;
+    React.useEffect = original.effect;
+    hooks.useAppStore = original.store;
+  }
+  const saved = find(library, (node) => node.type === SavedPresentations);
+  assert.equal(saved.props.onUploaded, undefined, "upload completion must not navigate");
+  const controller = saved.props.controller;
+  controller.attach();
+  t.after(() => controller.detach(true));
+  const control = uploadControl(f, controller, saved.props.onUploaded);
+  t.after(() => control.unmount());
+  control.choose();
+  await until(() => f.store.getState().workspace.upload.status !== "uploading");
+  assert.equal(f.store.getState().workspace.deck.id, A);
+  assert.equal(f.calls.length, 1, "only the upload request runs, without presenter data requests");
+});

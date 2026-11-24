@@ -1,17 +1,14 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/hooks";
 import { WorkspaceController } from "./WorkspaceController";
 import { WorkspaceHeader } from "./WorkspaceHeader";
 import { SavedPresentations } from "./SavedPresentations";
-import { presentationHref } from "./libraryHelpers";
 import "./workspace.css";
 
 export function PresentationLibrary() {
   const store = useAppStore();
-  const router = useRouter();
   const controller = useMemo(() => new WorkspaceController(store), [store]);
   useEffect(() => {
     controller.attach();
@@ -22,7 +19,7 @@ export function PresentationLibrary() {
     <a className="skip-link" href="#saved-presentations-title">Skip to presentations</a>
     <WorkspaceHeader />
     <main className="library-main">
-      <SavedPresentations controller={controller} onUploaded={(id) => router.push(presentationHref(id))} />
+      <SavedPresentations controller={controller} />
     </main>
   </div>;
 }

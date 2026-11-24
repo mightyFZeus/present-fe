@@ -256,3 +256,11 @@ Presentation view removes the preview from the rendered interface. Hold and Stop
 keep that view active until the presenter returns to the workspace. The preview
 then returns without another image request. Share Presentation view when the
 audience must see only the current slide.
+
+
+## Upload completion in the library
+
+A successful upload keeps the presenter on `/workspace`. The refreshed library
+shows the saved card and its preparation state. Queued and processing cards show
+Cadence and cannot open. Once the deck is ready, its link opens the presenter.
+Upload completion does not navigate or start microphone capture.
