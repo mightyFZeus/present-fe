@@ -237,3 +237,22 @@ per-file actions are respected across routes. Leaving the library or changing
 accounts stops queued work; already-started same-account CRUD still records its
 outcome through the existing owner guards. Selection/confirmation are transient
 and clear on route exit or account change. Opening a card stays a separate link.
+
+## Next slide and cue preview
+
+The presenter sidebar shows the next slide and a short speaking cue. The preview
+follows the displayed slide in deck order, including a return to an earlier slide.
+The final slide shows an end state. The preview never changes the current slide.
+
+The cue uses existing speaker notes first. If notes are empty, the cue uses the
+slide summary, slide text or title. A label identifies the source. Long text is
+shortened to 240 characters. No extra model request or manual preparation is required.
+
+The preview shares the current image owner with thumbnails and the main stage.
+Loading and image failures have visible states. Retry uses the existing asset owner.
+Changing the deck or account clears the old preview with the existing workspace state.
+
+Presentation view removes the preview from the rendered interface. Hold and Stop
+keep that view active until the presenter returns to the workspace. The preview
+then returns without another image request. Share Presentation view when the
+audience must see only the current slide.

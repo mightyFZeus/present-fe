@@ -195,8 +195,9 @@ function SavedPresentationCard({
         }}
       >
         <span className="saved-cover" aria-hidden="true">
-          <FileText size={38} strokeWidth={1.15} />
-          <span>{presentation.format.toUpperCase()}</span>
+          <span className="saved-cover-format"><FileText size={15} strokeWidth={1.5} />{presentation.format.toUpperCase()}</span>
+          <span className="saved-cover-title">{presentation.filename.replace(/\.(pdf|pptx)$/i, "")}</span>
+          <span className="saved-cover-bottom"><span>PREZNTLY / DECK</span><ArrowUpRight size={20} /></span>
         </span>
         <span className="saved-file-copy">
           <span className={`saved-status ${presentation.status}`}>
@@ -393,9 +394,9 @@ export function SavedPresentations({ controller, onUploaded }: {
   return <section className="saved-presentations" aria-labelledby="saved-presentations-title" aria-busy={query.isFetching}>
     <div className="section-heading saved-heading">
       <div className="library-heading-copy">
-        <p className="eyebrow">Your workspace</p>
+        <p className="eyebrow">Your presentation studio</p>
         <h1 id="saved-presentations-title" tabIndex={-1}>Your presentations</h1>
-        <p>Upload once. Open your prepared slides whenever you need them.</p>
+        <p>A place for your ideas, before they take the stage.</p>
       </div>
       <div className="library-heading-actions">
       <button type="button" className="button primary" disabled={!authenticated} onClick={() => {
@@ -410,6 +411,11 @@ export function SavedPresentations({ controller, onUploaded }: {
         onClick={() => void query.refetch()}
       ><RefreshCw size={15} aria-hidden="true" /></button>
       </div>
+    </div>
+    <div className="library-guide" aria-label="Presentation workflow">
+      <span><b>01</b> Bring your deck</span>
+      <span><b>02</b> Find your flow</span>
+      <span><b>03</b> Take the stage</span>
     </div>
     <div className="library-upload" hidden={!showUpload && (loading || !!query.error || presentations.length > 0)}>
       {!loading && !query.error && !presentations.length && <div className="library-empty-copy">

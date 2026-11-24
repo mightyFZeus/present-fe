@@ -58,6 +58,12 @@ stack the current-deck setup above the stage and retain readable 44px controls.
 Native upload inputs have explicit clipped styling, avoiding duplicate raw browser
 file-chooser controls beside the product button.
 
+The presenter sidebar includes a compact next-slide image, title, position and cue.
+The cue uses notes, then the slide summary, text or title. The image reuses the
+existing asset owner. The final slide shows an end state without wrapping.
+Presentation view removes the preview from the rendered interface. The main
+slide stage keeps its existing size. Narrow layouts retain the sidebar flow.
+
 Presentation view uses the existing dark stage across the viewport, with the slide
 centered and contained for either portrait or landscape pages. Header, setup,
 transcript, title and footnote chrome disappear without replacing the viewer or
@@ -233,3 +239,15 @@ existing provider’s restoration, withholds workspace children when invalid and
 replaces the route with `/login`; valid login opens `/workspace`, while valid
 restoration retains the requested protected library/presenter route.
 Cookies, storage rules, account cleanup and microphone behavior are unchanged.
+
+
+## November 24 studio refresh
+
+The library now uses a dark masthead, mint workflow strip, and paper-colored deck
+covers. Covers show real filenames and formats without extra image requests.
+The presenter keeps a light control area and dark slide stage. Its wider rail
+separates deck details from thumbnails. The existing next-slide preview remains.
+The landing page adds a Cadence sculpture, staggered entrance motion, and section
+reveals. Content stays visible without JavaScript. Reduced motion skips reveals
+and cancels active reveal animations. No microphone starts from a public example.
+This section replaces the earlier restrictions on landing entrance choreography.

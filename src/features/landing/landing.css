@@ -966,3 +966,55 @@
     opacity: 1;
   }
 }
+
+/* Cadence carries the voice-to-slide idea into the page composition. */
+.present-landing .landing-hero-heading { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 200px; align-items: center; gap: 32px; }
+.present-landing .landing-hero-heading .landing-intro { grid-column: 1 / -1; width: 100%; display: flex; align-items: center; gap: 12px; margin-bottom: -12px; }
+.present-landing .landing-intro-rule { width: 32px; height: 1px; background: var(--landing-accent); }
+.present-landing .landing-hero-heading h1 { flex: 1; }
+.present-landing .landing-cadence-sculpture { position: relative; flex: 0 0 200px; height: 180px; display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--landing-accent); }
+.present-landing .landing-cadence-sculpture > span { width: 18px; height: 36px; background: var(--landing-ink); border-radius: 4px; }
+.present-landing .landing-cadence-sculpture > span:nth-child(2) { height: 112px; }
+.present-landing .landing-cadence-sculpture > span:nth-child(3) { height: 68px; }
+.present-landing .landing-cadence-sculpture > span:nth-child(4) { width: 36px; height: 68px; border: 9px solid currentColor; background: transparent; border-radius: 0; }
+.present-landing .landing-cadence-sculpture small { position: absolute; bottom: 0; font-size: 9px; letter-spacing: 0.18em; color: var(--landing-muted); }
+.present-landing .landing-stage { border: 1px solid var(--landing-line); box-shadow: 0 24px 60px oklch(0.08 0.01 190 / 0.25); }
+.present-landing .landing-stage-projector { padding: 10px; border-color: var(--landing-line); background: var(--landing-surface); }
+.present-landing .landing-stage-topics button { border-radius: 6px; }
+.present-landing .landing-command-section { position: relative; }
+.present-landing .landing-command-examples { padding: 32px; border: 1px solid oklch(0.76 0.025 165); border-radius: 8px; }
+.present-landing .landing-steps { gap: 24px; }
+.present-landing .landing-step-number { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid var(--landing-line); border-radius: 50%; }
+.present-landing .landing-closing { padding-block: 110px; }
+@media (min-width: 1100px) {
+  .present-landing .landing-hero h1 { font-size: clamp(70px, 6.5vw, 98px); }
+  .present-landing .landing-benefits { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+  .present-landing .landing-scene-image { height: 460px; }
+}
+@media (max-width: 1000px) { .present-landing .landing-cadence-sculpture { flex-basis: 140px; transform: scale(0.8); transform-origin: right center; } }
+@media (max-width: 760px) {
+  .present-landing .landing-cadence-sculpture { display: none; }
+  .present-landing .landing-hero-heading { grid-template-columns: 1fr; gap: 24px; }
+  .present-landing .landing-hero-heading .landing-intro { margin-bottom: 0; }
+  .present-landing .landing-command-examples { padding: 24px; }
+  .present-landing .landing-steps li { grid-template-columns: 38px minmax(0, 1fr); }
+  .present-landing .landing-closing { padding-block: 72px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .present-landing .landing-hero-bottom { animation: landing-hero-enter 650ms 100ms both var(--landing-ease-out); }
+  .present-landing .landing-stage { animation: landing-hero-enter 750ms 180ms both var(--landing-ease-out); }
+  .present-landing .landing-cadence-sculpture > span { animation: landing-cadence-rise 900ms both var(--landing-ease-out); transform-origin: center; }
+  .present-landing .landing-cadence-sculpture > span:nth-child(2) { animation-delay: 120ms; }
+  .present-landing .landing-cadence-sculpture > span:nth-child(3) { animation-delay: 240ms; }
+  .present-landing .landing-cadence-sculpture > span:nth-child(4) { animation-delay: 360ms; }
+  .present-landing .landing-stage-topics button, .present-landing .landing-primary-link, .present-landing .landing-sign-in { transition: transform 200ms var(--landing-ease-out), background-color 200ms ease-out; }
+  .present-landing .landing-stage-topics button:active, .present-landing .landing-primary-link:active { transform: scale(0.97); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .present-landing .landing-stage-topics button:hover { transform: translateY(-3px); }
+  .present-landing .landing-primary-link:hover { transform: translateY(-2px); }
+}
+@keyframes landing-cadence-rise {
+  from { opacity: 0; transform: scaleY(0.15) translateY(16px); }
+  to { opacity: 1; transform: none; }
+}

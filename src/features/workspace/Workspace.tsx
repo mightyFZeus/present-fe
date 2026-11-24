@@ -9,6 +9,7 @@ import { orderedSlides } from "./navigationHelpers";
 import { canonicalPresentationId, isPresentationId } from "./libraryHelpers";
 import { SlideList } from "./SlideList";
 import { SlideStage } from "./SlideStage";
+import { PresenterPreview } from "./PresenterPreview";
 import { FollowingControls } from "./FollowingControls";
 import { RecentSpeech } from "./RecentSpeech";
 import { PresentationFocus } from "./PresentationFocus";
@@ -16,6 +17,7 @@ import { deckRenamed } from "./workspaceSlice";
 import { selectPresentation } from "./presentationSlice";
 import { installPresentationStore } from "./presentationStore";
 import "./workspace.css";
+import "./presenterPreview.css";
 
 export function Workspace({ presentationId }: { presentationId?: string } = {}) {
   const store = useAppStore();
@@ -93,6 +95,7 @@ export function Workspace({ presentationId }: { presentationId?: string } = {}) 
             <span className={`preparation-status ${status ?? ""}`}><span className="status-dot" aria-hidden="true" />{status === "ready" ? "Ready" : status === "queued" ? "Queued" : status === "processing" ? "Preparing" : status === "failed" ? "Preparation failed" : "Loading"}</span>
           </div>
         </div>}
+        {!view.active && <PresenterPreview deck={presentation} slides={slides} controller={controller} />}
         <SlideList slides={slides} controller={controller} />
       </aside>
         <PresentationFocus slides={slides} ready={presentation?.status === "ready" && slides.length > 0} workspace={controller}>

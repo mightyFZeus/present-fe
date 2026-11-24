@@ -1,4 +1,5 @@
 import "./landing.css";
+import { LandingMotion } from "./LandingMotion";
 import { landingDisplay, landingSans } from "./landingFont";
 import { LandingHeader } from "./LandingHeader";
 import { LandingHero } from "./LandingHero";
@@ -17,6 +18,7 @@ export function LandingPage() {
     landingDisplay.variable,
   ].join(" ")}>
     <a className="landing-skip-link" href="#main-content">Skip to content</a>
+    <LandingMotion />
     <LandingHeader />
     <main id="main-content" tabIndex={-1}>
       <LandingHero />

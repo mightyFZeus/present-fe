@@ -20,8 +20,10 @@ export class SlideAssets {
     this.drain();
   }
   retry(deck: string, id: string, intent: number) {
-    const previous = this.records.get(id); previous?.abort?.();
-    if (previous?.resource) void this.store.dispatch(releaseAsset({ key: previous.key, url: previous.resource.url }));
+    const previous = this.records.get(id);
+    if (!previous || !this.current(previous) || previous.deck !== deck || previous.intent !== intent) return;
+    previous.abort?.();
+    if (previous.resource) void this.store.dispatch(releaseAsset({ key: previous.key, url: previous.resource.url }));
     this.enqueue(deck, id, intent); this.drain();
   }
   private enqueue(deck: string, id: string, intent: number) {

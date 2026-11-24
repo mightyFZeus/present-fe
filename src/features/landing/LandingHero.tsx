@@ -5,8 +5,12 @@ import { LandingStage } from "./LandingStage";
 export function LandingHero() {
   return <section className="landing-shell landing-hero" aria-labelledby="hero-title">
     <div className="landing-hero-heading">
-      <p className="landing-intro">Present with your voice</p>
+      <p className="landing-intro"><span className="landing-intro-rule" />Present with your voice</p>
       <h1 id="hero-title">Speak <em>naturally.</em><br />Your slides follow.</h1>
+      <div className="landing-cadence-sculpture" aria-hidden="true">
+        <span /><span /><span /><span />
+        <small>VOICE → FOCUS</small>
+      </div>
     </div>
     <div className="landing-hero-bottom">
       <p className="landing-hero-description">

@@ -1,5 +1,6 @@
-import { BrandMark } from "@/components/BrandMark";
 "use client";
+
+import { BrandMark } from "@/components/BrandMark";
 
 import Link from "next/link";
 import { ArrowLeft, LogOut, UserRound } from "lucide-react";

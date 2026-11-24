@@ -21,8 +21,9 @@ cards and real preparation status.
 Presenters can rename, permanently delete, and reopen a prepared deck without
 uploading or preparing it again. Each card opens its own
 `/workspace/[presentationId]` page; opening never starts the microphone. The
-presenter sidebar contains only the current deck and its slides, with a clear
-Back to workspace link. The library owns new uploads and empty states. Native checkboxes support selecting
+presenter sidebar contains the current deck and its slides, with a clear
+Back to workspace link. It also shows the next slide and a short cue from existing slide metadata.
+Presentation view removes these private previews from the audience-facing stage. The library owns new uploads and empty states. Native checkboxes support selecting
 multiple shown files, with confirmed deletion and honest per-file retry after a
 partial failure. Select all applies only to loaded available cards.
 Success means the current slide is clear and listening state is unmistakable.
