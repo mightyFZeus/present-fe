@@ -10,7 +10,7 @@ export function LandingFooter() {
     </div>
     <div className="landing-shell landing-footer-bar">
       <Link href="/" className="landing-brand" aria-label="Prezntly home"><BrandMark /><span>Prezntly</span></Link>
-      <nav aria-label="Footer navigation"><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#questions">Questions</a><Link href="/login">Workspace</Link></nav>
+      <nav aria-label="Footer navigation"><a href="/#features">Features</a><a href="/#how-it-works">How it works</a><a href="/#questions">Questions</a><Link href="/login">Workspace</Link></nav>
     </div>
     <div className="landing-shell landing-photo-credit">Presentation photography by <a href="https://unsplash.com/photos/speaker-presenting-to-a-large-audience-in-an-auditorium-qzO9a6oQ8AM">Marwen Larafa on Unsplash</a>.</div>
   </footer>;
