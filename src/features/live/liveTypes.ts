@@ -16,6 +16,7 @@ export interface NavigationProposal {
 }
 
 export interface LiveSessionResponse {
+  transcriptId?: string;
   sessionId: string;
   ticket: string;
   ticketExpiresAt: string;

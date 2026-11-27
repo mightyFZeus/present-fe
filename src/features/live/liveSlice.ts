@@ -4,6 +4,7 @@ import type { LiveEvent, LiveSessionMetadata, NavigationProposal } from "./liveT
 export interface LiveState {
   status: "idle" | "connecting" | "ready" | "updating" | "ended" | "error";
   session: LiveSessionMetadata | null;
+  transcriptId: string | null;
   presentationId: string | null;
   epoch: string | null;
   generation: number;
@@ -18,7 +19,7 @@ export interface LiveState {
   error: string | null;
 }
 const initialState: LiveState = {
-  status: "idle", session: null, presentationId: null, epoch: null, generation: 0, version: 0,
+  status: "idle", session: null, transcriptId: null, presentationId: null, epoch: null, generation: 0, version: 0,
   held: true, acceptsAudio: false, transcriptSeq: 0, publishedSeq: 0,
   interim: "", segments: [], proposal: null, error: null,
 };
@@ -26,9 +27,15 @@ const slice = createSlice({
   name: "live",
   initialState,
   reducers: {
-    livePreparing: (_, action: PayloadAction<string>) => ({ ...initialState, presentationId: action.payload, status: "connecting" as const }),
+    livePreparing: (state, action: PayloadAction<string>) => ({
+      ...initialState,
+      transcriptId: state.presentationId === action.payload ? state.transcriptId : null,
+      presentationId: action.payload,
+      status: "connecting" as const,
+    }),
     liveConnecting(state, action: PayloadAction<{ session: LiveSessionMetadata; presentationId: string }>) {
-      Object.assign(state, initialState, { status: "connecting", session: action.payload.session, presentationId: action.payload.presentationId });
+      const transcriptId = action.payload.session.transcriptId ?? state.transcriptId;
+      Object.assign(state, initialState, { status: "connecting", session: action.payload.session, transcriptId, presentationId: action.payload.presentationId });
     },
     liveUpdating(state) { state.status = "updating"; state.acceptsAudio = false; state.proposal = null; },
     liveEventReceived(state, action: PayloadAction<{ event: LiveEvent; at: number }>) {
@@ -75,8 +82,9 @@ const slice = createSlice({
       state.proposal = null;
       state.error = null;
     },
+    transcriptFinished(state) { state.transcriptId = null; },
     liveReset: () => initialState,
   },
 });
-export const { livePreparing, liveConnecting, liveUpdating, liveEventReceived, liveFailed, liveStopped, liveReset } = slice.actions;
+export const { livePreparing, liveConnecting, liveUpdating, liveEventReceived, liveFailed, liveStopped, liveReset, transcriptFinished } = slice.actions;
 export const liveReducer = slice.reducer;

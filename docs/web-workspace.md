@@ -266,3 +266,21 @@ A successful upload keeps the presenter on `/workspace`. The refreshed library
 shows the saved card and its preparation state. Queued and processing cards show
 Cadence and cannot open. Once the deck is ready, its link opens the presenter.
 Upload completion does not navigate or start microphone capture.
+
+
+## Session transcripts
+
+The presenter workspace lists saved transcripts beneath Recent speech. Each row
+has a date, session state, passage count, and Download transcript button. Downloads
+use authenticated requests and create temporary text files in the browser.
+The app discards late responses after logout or account changes. Leaving the
+page cancels a pending download. Transcript metadata uses the shared RTK Query API.
+Transcript text and audio do not enter its cache.
+
+Hold and Resume retain one transcript ID, including after a failed reconnection.
+Stop closes that transcript and clears the retained ID before the next Start.
+Opening a deck can load transcript history without starting the microphone.
+Presentation view hides the transcript panel from the audience-facing surface.
+A download contains saved finalized speech. A last unfinished phrase is omitted.
+The server stores text only. Deleting the saved deck also removes its transcripts.
+Deploy the transcript database migration and API before this frontend release.

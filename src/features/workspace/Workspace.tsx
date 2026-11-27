@@ -11,6 +11,7 @@ import { SlideList } from "./SlideList";
 import { SlideStage } from "./SlideStage";
 import { PresenterPreview } from "./PresenterPreview";
 import { FollowingControls } from "./FollowingControls";
+import { SessionTranscripts } from "@/features/transcripts/SessionTranscripts";
 import { PresentationFocus } from "./PresentationFocus";
 import { deckRenamed } from "./workspaceSlice";
 import { selectPresentation } from "./presentationSlice";
@@ -100,6 +101,7 @@ export function Workspace({ presentationId }: { presentationId?: string } = {}) 
         <PresentationFocus slides={slides} ready={presentation?.status === "ready" && slides.length > 0} workspace={controller}>
           <SlideStage deck={presentation} slides={slides} loading={!!id && (metadata.isFetching && !presentation || presentation?.status === "ready" && slideQuery.isFetching && !slides.length)} error={!!metadata.error || !!slideQuery.error} retry={() => { if (presentation?.status === "ready") void slideQuery.refetch(); else void metadata.refetch(); }} controller={controller} />
           <FollowingControls slides={slides} ready={presentation?.status === "ready" && slides.length > 0} controller={controller} />
+          {selected && <SessionTranscripts key={selected.id} presentationId={selected.id} />}
         </PresentationFocus>
       </main>}
   </div>;

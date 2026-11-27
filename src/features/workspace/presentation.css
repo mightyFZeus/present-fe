@@ -4,7 +4,8 @@
 .present-workspace.is-presenting .skip-link,
 .presentation-active .stage-heading,
 .presentation-active .stage-footnote,
-.presentation-active > .following-panel { display: none; }
+.presentation-active > .following-panel,
+.presentation-active > .transcript-panel { display: none; }
 .present-workspace.is-presenting .workspace-body { display: block; min-height: 0; }
 .presentation-host.presentation-active {
   position: fixed; inset: 0; z-index: 50;

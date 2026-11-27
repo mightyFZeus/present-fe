@@ -1,3 +1,5 @@
+import { transcriptFinished } from "@/features/live/liveSlice";
+import { finishTranscript } from "@/features/transcripts/transcriptDownload";
 import type { AppStore } from "@/store/store";
 import { connectLiveSession, sendLivePcm, stopLiveSession } from "@/features/live/liveThunks";
 import { sessionCleared } from "@/features/auth/authSlice";
@@ -129,7 +131,13 @@ export class CaptureController {
       // then rebind this operation's live cleanup immediately after that transition.
       op.unbindLive?.(); op.unbindLive = undefined;
       this.store.dispatch(micChanged({ status: "connecting" }));
-      const connection = this.store.dispatch(connectLiveSession({ presentationId: deck.id, snapshot: next }));
+      const connection = this.store.dispatch(connectLiveSession({
+        presentationId: deck.id,
+        snapshot: next,
+        transcriptId: state.live.presentationId === deck.id &&
+          (state.workspace.mic.status === "held" || state.workspace.mic.status === "error") ?
+          state.live.transcriptId ?? undefined : undefined,
+      }));
       op.abort = connection.abort;
       if (!this.valid(op)) { connection.abort(); return; }
       op.unbindLive = this.store.resources.registerCleanup("live", () => this.externalStop(op));
@@ -204,8 +212,15 @@ export class CaptureController {
     this.store.dispatch(micChanged({ status: "held", error: message }));
   }
   stop() {
+    const current = this.store.getState();
+    const transcriptId = current.live.transcriptId;
+    this.store.dispatch(transcriptFinished());
+    const presentationId = current.live.presentationId;
     if (this.operation) this.dispose(this.operation);
     void this.store.dispatch(stopLiveSession()); this.markHeld();
     this.store.dispatch(micChanged({ status: "off" }));
+    if (transcriptId && presentationId && current.auth.accessToken) {
+      void this.store.dispatch(finishTranscript({ presentationId, transcriptId }));
+    }
   }
 }

@@ -5,6 +5,7 @@ const MAX_BUFFERED_AUDIO_BYTES = 6400;
 const AUDIO_BACKLOG_LIMIT_MS = 1000;
 const SERVER_CLOSE_GRACE_MS = 500;
 const CONNECTION_ENDED = "The live connection ended. Resume following when ready.";
+const TRANSCRIPT_SAVE_FAILED = "Transcript saving stopped. Download the saved text, select Stop, then start a new session.";
 const TRANSCRIPTION_UNAVAILABLE = "Speech recognition is unavailable. Resume following to try again.";
 
 function closeMessage(code: number, reason: string): string {
@@ -23,6 +24,7 @@ function closeMessage(code: number, reason: string): string {
   if (code === 1011 && reason === "transcription unavailable") {
     return TRANSCRIPTION_UNAVAILABLE;
   }
+  if (code === 1011 && reason === "transcript saving unavailable") return TRANSCRIPT_SAVE_FAILED;
   return CONNECTION_ENDED;
 }
 
@@ -163,7 +165,8 @@ export class LiveClient implements LiveHandle {
     if (event.type === "error" && !event.acceptsAudio) {
       this.serverEnded = true;
       this.ready = false;
-      this.fail(event.code === "transcription_unavailable" ? TRANSCRIPTION_UNAVAILABLE : CONNECTION_ENDED);
+      this.fail(event.code === "transcription_unavailable" ? TRANSCRIPTION_UNAVAILABLE :
+        event.code === "transcript_save_failed" ? TRANSCRIPT_SAVE_FAILED : CONNECTION_ENDED);
       return;
     }
     if (event.type === "ended") {

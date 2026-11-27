@@ -22,12 +22,14 @@ export function readLiveSession(value: unknown, origin: string): LiveSessionResp
       typeof value.expiresAt !== "string" || typeof value.ticketExpiresAt !== "string" ||
       Date.parse(value.expiresAt) <= Date.now() || Date.parse(value.ticketExpiresAt) <= Date.now() ||
       !Number.isFinite(Date.parse(value.expiresAt)) || !Number.isFinite(Date.parse(value.ticketExpiresAt)) ||
+      (value.transcriptId !== undefined && !id(value.transcriptId)) ||
       !isRecord(value.audio) || value.audio.encoding !== "pcm_s16le" ||
       value.audio.sampleRate !== 16000 || value.audio.channels !== 1) return;
   const url = new URL(value.wsPath, origin);
   if (url.origin !== origin || url.search || url.hash || url.username || url.password) return;
   return {
     sessionId: value.sessionId,
+    ...(value.transcriptId ? { transcriptId: value.transcriptId as string } : {}),
     ticket: value.ticket,
     ticketExpiresAt: value.ticketExpiresAt,
     expiresAt: value.expiresAt,
