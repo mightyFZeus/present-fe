@@ -10,9 +10,10 @@ const { sessionEstablished } = load("../src/features/auth/authSlice.ts");
 const { logout } = load("../src/features/auth/authThunks.ts");
 const { deckSelected, snapshotChanged, micChanged, micLevel, workspaceReset } = load("../src/features/workspace/workspaceSlice.ts");
 const viewModule = load("../src/features/workspace/presentationSlice.ts");
-const { presentationEntered, presentationControlsHidden, selectPresentation } = viewModule;
+const { presentationEntered, presentationExited, presentationControlsHidden, selectPresentation } = viewModule;
 const { installPresentationStore } = load("../src/features/workspace/presentationStore.ts");
 const { PresentationController } = load("../src/features/workspace/PresentationController.ts");
+const { liveEventReceived } = load("../src/features/live/liveSlice.ts");
 const ID = "11111111-1111-4111-8111-111111111111";
 const slides = [1, 2].map((position) => ({ id: `22222222-2222-4222-8222-${String(position).padStart(12, "0")}`, position, title: `Topic ${position}`, text: "", meaning: "", notes: "" }));
 function fixture(t, install = true) {
@@ -161,6 +162,60 @@ test("focused toolbar respects snapshot Hold, keeps Stop available, and hides co
   assert.equal(find(tree, (node) => node.props?.role === "status").props.children.at(-1), "Following paused");
   f.store.dispatch(presentationControlsHidden()); tree = PresentationControls(props);
   assert.equal(tree.props.inert, true); assert.equal(tree.props["aria-hidden"], true);
+});
+
+test("presentation view shows current live speech outside the auto-hidden controls", (t) => {
+  const { store, workspace } = fixture(t);
+  const { createElement } = load("react");
+  const { renderToStaticMarkup } = load("react-dom/server");
+  const { Provider } = load("react-redux");
+  const cssLoader = load.extensions[".css"];
+  load.extensions[".css"] = () => {};
+  t.after(() => {
+    if (cssLoader) load.extensions[".css"] = cssLoader;
+    else delete load.extensions[".css"];
+  });
+  const { PresentationFocus } = load("../src/features/workspace/PresentationFocus.tsx");
+  const render = () => renderToStaticMarkup(createElement(
+    Provider,
+    { store },
+    createElement(PresentationFocus, { slides, ready: true, workspace }, createElement("div", null, "Slide")),
+  ));
+  const transcript = (text, isFinal, sequence) => store.dispatch(liveEventReceived({
+    at: sequence,
+    event: {
+      type: "transcript",
+      text,
+      isFinal,
+      transcriptSeq: sequence,
+      epoch: ID,
+      generation: 1,
+      version: 1,
+      held: false,
+      acceptsAudio: true,
+    },
+  }));
+  const overlay = /aria-label="Live transcript" aria-live="off"><p>(.*?)<\/p>/;
+
+  transcript("The first topic is complete.", true, 1);
+  assert.doesNotMatch(render(), overlay);
+  assert.match(render(), /Recent speech.*The first topic is complete/);
+
+  store.dispatch(presentationEntered());
+  assert.equal(render().match(overlay)?.[1], "The first topic is complete.");
+  assert.doesNotMatch(render(), /class="speech-panel"/);
+
+  transcript("Audience focus is", false, 1);
+  store.dispatch(presentationControlsHidden());
+  assert.match(render(), /presentation-toolbar is-hidden/);
+  assert.equal(render().match(overlay)?.[1], "Audience focus is");
+
+  transcript("Audience focus is the goal.", true, 2);
+  assert.equal(render().match(overlay)?.[1], "Audience focus is the goal.");
+
+  store.dispatch(presentationExited());
+  assert.doesNotMatch(render(), overlay);
+  assert.match(render(), /Recent speech.*Audience focus is the goal/);
 });
 
 test("fullscreen is gesture-only, Escape leaves native first, and unsupported fullscreen preserves capture", async (t) => {

@@ -5,6 +5,7 @@ import type { PresentationSlide } from "@/features/presentations/presentationTyp
 import type { WorkspaceController } from "./WorkspaceController";
 import { PresentationController } from "./PresentationController";
 import { PresentationControls } from "./PresentationControls";
+import { RecentSpeech } from "./RecentSpeech";
 import { selectPresentation } from "./presentationSlice";
 import "./presentation.css";
 
@@ -25,6 +26,7 @@ export function PresentationFocus({ children, slides, ready, workspace }: {
   }, [controller]);
   return <div className={`studio presentation-host ${view.active ? "presentation-active" : ""}`} id="presentation-stage" tabIndex={-1} ref={root}>
     {children}
+    <RecentSpeech presentation={view.active} />
     {view.active && <PresentationControls slides={slides} ready={ready} workspace={workspace} controller={controller} />}
   </div>;
 }

@@ -4,8 +4,7 @@
 .present-workspace.is-presenting .skip-link,
 .presentation-active .stage-heading,
 .presentation-active .stage-footnote,
-.presentation-active > .following-panel,
-.presentation-active > .speech-panel { display: none; }
+.presentation-active > .following-panel { display: none; }
 .present-workspace.is-presenting .workspace-body { display: block; min-height: 0; }
 .presentation-host.presentation-active {
   position: fixed; inset: 0; z-index: 50;
@@ -19,6 +18,15 @@
 }
 .presentation-active .stage-image { object-fit: contain; }
 .presentation-active .slide-stage:focus-visible { outline-offset: -3px; }
+.presentation-transcript {
+  position: absolute; z-index: 1; left: 50%; top: max(16px, env(safe-area-inset-top));
+  transform: translateX(-50%); width: max-content; max-width: min(48rem, calc(100% - 24px));
+  max-height: min(9rem, 25dvh); overflow: hidden; overflow-wrap: anywhere;
+  padding: 10px 16px; border-radius: 8px; pointer-events: none;
+  color: white; background: black; text-align: center;
+  font-size: clamp(14px, 2vw, 22px); line-height: 1.45;
+}
+.presentation-transcript p { margin: 0; }
 .presentation-toolbar {
   position: absolute; z-index: 2; left: 50%; bottom: max(20px, env(safe-area-inset-bottom));
   transform: translateX(-50%); max-width: calc(100% - 24px);

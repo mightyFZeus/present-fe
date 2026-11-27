@@ -133,9 +133,11 @@ The per-store runtime synchronously cleans media on reset before React effects.
 
 Following enters presentation view only when capture actually reaches listening.
 A small Presentation view button also enters it without starting a microphone or
-opening a live session. The slide fills the viewport with contain sizing, while
-the header, sidebar, transcript and stage labels are hidden from display and tab
-navigation. The existing viewer, queries, assets and navigation remain mounted.
+opening a live session. The slide fills the viewport. The header, sidebar and
+stage labels are hidden. A black overlay shows the latest transcript at the top
+of the slide, including in fullscreen. It shows the most recent finalized speech
+when no new words are coming in. The overlay stays visible when the toolbar hides.
+Viewers can see the transcript when you share the presentation view.
 
 Hold, Stop, errors and brief server readiness gaps retain the presentation layout.
 A held navigation snapshot shows Resume even if capture still reports listening;
